@@ -26,7 +26,7 @@ export function SuggestionBox() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          access_key: "YOUR_ACCESS_KEY_HERE", // I'll mention this to the user
+          access_key: "07bff371-df1d-44af-a456-578ae90d2cec", 
           name: formData.name,
           email: formData.email,
           message: formData.message,
@@ -56,9 +56,9 @@ export function SuggestionBox() {
         <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
         
         <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-2 tracking-tight">Leave a Suggestion</h2>
+          <h2 className="text-3xl font-bold mb-2 tracking-tight">Whisper to the Algorithm</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-8 font-medium">
-            Have an idea for the site? I'd love to hear it.
+            Think I missed a 10/10 drama? Or just have a feature request? Drop it here.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -126,7 +126,7 @@ export function SuggestionBox() {
                   </motion.div>
                 ) : (
                   <div className="text-xs text-gray-400">
-                    I'll get back to you as soon as possible.
+                    {/* Removed text */}
                   </div>
                 )}
               </AnimatePresence>
