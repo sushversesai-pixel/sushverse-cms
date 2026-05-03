@@ -126,7 +126,7 @@ export function FlipCard({
                           />
                         ))}
                       </div>
-                      <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mt-1">{numRating}</span>
+                      <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mt-1">{numRating.toFixed(1)}</span>
                     </>
                   ) : (
                     <span className="text-sm font-medium text-yellow-600 dark:text-yellow-400 mt-1">{rating}</span>
