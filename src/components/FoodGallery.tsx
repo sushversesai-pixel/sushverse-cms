@@ -17,7 +17,7 @@ export function FoodGallery({ items }: { items: FoodItem[] }) {
 
   return (
     <>
-      <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6">
+      <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
         {items.map((item) => (
           <div 
             key={item.id} 

@@ -41,19 +41,20 @@ export default async function BooksPage() {
             Currently Reading
             <span className="ml-3 text-sm font-normal text-gray-400">({currentlyReading.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
             {currentlyReading.map((book) => (
-              <FlipCard
-                key={book.id}
-                title={book.title}
-                subtitle={book.author}
-                status="Reading"
-                coverUrl={book.coverUrl}
-                link={book.link}
-                colorTheme="emerald"
-                rating={book.rating}
-                review={book.review}
-              />
+              <div key={book.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  title={book.title}
+                  subtitle={book.author}
+                  status="Reading"
+                  coverUrl={book.coverUrl}
+                  link={book.link}
+                  colorTheme="emerald"
+                  rating={book.rating}
+                  review={book.review}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -66,18 +67,19 @@ export default async function BooksPage() {
             Finished
             <span className="ml-3 text-sm font-normal text-gray-400">({readBooks.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
             {readBooks.map((book) => (
-              <FlipCard
-                key={book.id}
-                title={book.title}
-                subtitle={book.author}
-                coverUrl={book.coverUrl}
-                link={book.link}
-                colorTheme="emerald"
-                rating={book.rating}
-                review={book.review}
-              />
+              <div key={book.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  title={book.title}
+                  subtitle={book.author}
+                  coverUrl={book.coverUrl}
+                  link={book.link}
+                  colorTheme="emerald"
+                  rating={book.rating}
+                  review={book.review}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -90,19 +92,20 @@ export default async function BooksPage() {
             Want to Read
             <span className="ml-3 text-sm font-normal text-gray-400">({toRead.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
             {toRead.map((book) => (
-              <FlipCard
-                key={book.id}
-                title={book.title}
-                subtitle={book.author}
-                status="Wishlist"
-                coverUrl={book.coverUrl}
-                link={book.link}
-                colorTheme="emerald"
-                rating={book.rating}
-                review={book.review}
-              />
+              <div key={book.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  title={book.title}
+                  subtitle={book.author}
+                  status="Wishlist"
+                  coverUrl={book.coverUrl}
+                  link={book.link}
+                  colorTheme="emerald"
+                  rating={book.rating}
+                  review={book.review}
+                />
+              </div>
             ))}
           </div>
         </section>

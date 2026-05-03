@@ -55,7 +55,7 @@ export function SuggestionBox() {
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
         
-        <div className="relative z-10">
+        <div className="relative z-10 text-right">
           <h2 className="text-3xl font-bold mb-2 tracking-tight">Whisper to the Algorithm</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-8 font-medium">
             Think I missed a 10/10 drama? Or just have a feature request? Drop it here.

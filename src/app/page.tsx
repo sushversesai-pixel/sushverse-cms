@@ -53,8 +53,8 @@ export default async function Home() {
         </p>
       </section>
 
-      <div className="w-full mb-12 flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Recent Updates</h2>
+      <div className="w-full mb-12 flex items-center justify-end">
+        <h2 className="text-3xl font-bold border-b-2 border-gray-900 dark:border-white pb-2">Recent Updates</h2>
       </div>
 
       <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
