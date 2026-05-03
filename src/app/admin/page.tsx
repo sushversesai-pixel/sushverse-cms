@@ -445,8 +445,8 @@ function KDramasPanel() {
             <textarea required value={review} onChange={(e) => setReview(e.target.value)} rows={5} className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="What did you think of it?" />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Star Rating (1-5, Optional)</label>
-            <input type="number" min="1" max="5" step="0.5" value={rating} onChange={(e) => setRating(e.target.value)} className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. 4.5" />
+            <label className="block text-sm font-medium mb-1">Star Rating (0.5 - 5, Optional)</label>
+            <input type="number" min="0.5" max="5" step="0.5" value={rating} onChange={(e) => setRating(e.target.value)} className="w-full px-4 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. 4.5" />
           </div>
           <button type="submit" disabled={!title || loadingTitles} className="px-6 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white rounded-xl font-medium transition-colors">Save Override</button>
         </form>

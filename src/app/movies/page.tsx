@@ -2,7 +2,7 @@ import { getRecentMovies } from "@/lib/letterboxd";
 import { fetchDocumentRest } from "@/lib/firebase-rest";
 import { FlipCard } from "@/components/FlipCard";
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 60;
 
 export default async function MoviesPage() {
   const [movies, headerData] = await Promise.all([

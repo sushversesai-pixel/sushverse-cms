@@ -8,7 +8,7 @@ import { getRecentDramas } from "@/lib/mydramalist";
 import { getRecentBooks } from "@/lib/goodreads";
 
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 async function getSiteSettings() {
   try {

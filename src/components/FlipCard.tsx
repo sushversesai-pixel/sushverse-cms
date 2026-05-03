@@ -104,19 +104,26 @@ export function FlipCard({
             {subtitle && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{subtitle}</p>}
             
             {rating ? (
-              <div className="flex items-center justify-center gap-0.5 mb-3">
+              <div className="flex flex-col items-center mb-3">
                 {typeof rating === 'number' ? (
-                  [1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={14}
-                      className={`${
-                        star <= rating
-                          ? "fill-current text-yellow-500"
-                          : "text-gray-200 dark:text-gray-800"
-                      }`}
-                    />
-                  ))
+                  <>
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          size={14}
+                          className={`${
+                            star <= Math.floor(rating)
+                              ? "fill-current text-yellow-500"
+                              : star - 0.5 <= rating
+                                ? "fill-current text-yellow-500/50"
+                                : "text-gray-200 dark:text-gray-800"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mt-1">{rating}/5</span>
+                  </>
                 ) : (
                   <span className="text-sm font-medium text-yellow-600 dark:text-yellow-500">{rating}</span>
                 )}

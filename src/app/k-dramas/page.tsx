@@ -2,7 +2,7 @@ import { getRecentDramas } from "@/lib/mydramalist";
 import { fetchDocumentRest } from "@/lib/firebase-rest";
 import { FlipCard } from "@/components/FlipCard";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export default async function KDramasPage() {
   const [dramas, headerData] = await Promise.all([
@@ -13,8 +13,12 @@ export default async function KDramasPage() {
   const pageTitle = headerData?.title || "K-Dramas";
   const pageSubtitle = headerData?.subtitle || "Tracked shows from MyDramaList.";
 
-  const completedDramas = dramas.filter(d => !d.status.toLowerCase().includes("drop"));
-  const droppedDramas = dramas.filter(d => d.status.toLowerCase().includes("drop"));
+  const currentlyWatching = dramas.filter(d => d.status.toLowerCase().includes("currently watching"));
+  const completed = dramas.filter(d => d.status.toLowerCase() === "completed");
+  const planToWatch = dramas.filter(d => d.status.toLowerCase().includes("plan to watch"));
+  const dropped = dramas.filter(d => d.status.toLowerCase().includes("drop"));
+  // Anything that doesn't match goes into completed as a fallback
+  const onHold = dramas.filter(d => d.status.toLowerCase().includes("on hold"));
 
   return (
     <div className="flex-1 max-w-6xl mx-auto w-full px-4 py-12">
@@ -32,40 +36,118 @@ export default async function KDramasPage() {
         </div>
       )}
 
-      {completedDramas.length > 0 && (
+      {currentlyWatching.length > 0 && (
         <section className="mb-16">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <span className="w-3 h-3 rounded-full bg-emerald-500 mr-3"></span>
-            Watched & Watching
+            <span className="w-3 h-3 rounded-full bg-blue-500 mr-3 animate-pulse"></span>
+            Currently Watching
+            <span className="ml-3 text-sm font-normal text-gray-400">({currentlyWatching.length})</span>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            {completedDramas.map((drama) => (
+            {currentlyWatching.map((drama) => (
               <FlipCard
                 key={drama.id}
                 title={drama.title}
-                status={drama.status.toLowerCase() === "completed" ? undefined : drama.status}
+                subtitle={drama.year ? `(${drama.year})` : ""}
+                status="Watching"
                 coverUrl={drama.coverUrl}
                 link={drama.link}
                 colorTheme="rose"
                 rating={drama.rating}
-                review={(drama as any).review || null} // Optional review from manual overrides
+                review={(drama as any).review || null}
               />
             ))}
           </div>
         </section>
       )}
 
-      {droppedDramas.length > 0 && (
-        <section>
+      {completed.length > 0 && (
+        <section className="mb-16">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <span className="w-3 h-3 rounded-full bg-rose-500 mr-3"></span>
-            Dropped
+            <span className="w-3 h-3 rounded-full bg-emerald-500 mr-3"></span>
+            Completed
+            <span className="ml-3 text-sm font-normal text-gray-400">({completed.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 opacity-70">
-            {droppedDramas.map((drama) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            {completed.map((drama) => (
               <FlipCard
                 key={drama.id}
                 title={drama.title}
+                subtitle={drama.year ? `(${drama.year})` : ""}
+                coverUrl={drama.coverUrl}
+                link={drama.link}
+                colorTheme="rose"
+                rating={drama.rating}
+                review={(drama as any).review || null}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {planToWatch.length > 0 && (
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <span className="w-3 h-3 rounded-full bg-amber-500 mr-3"></span>
+            Plan to Watch
+            <span className="ml-3 text-sm font-normal text-gray-400">({planToWatch.length})</span>
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            {planToWatch.map((drama) => (
+              <FlipCard
+                key={drama.id}
+                title={drama.title}
+                subtitle={drama.year ? `(${drama.year})` : ""}
+                status="Plan to Watch"
+                coverUrl={drama.coverUrl}
+                link={drama.link}
+                colorTheme="rose"
+                rating={drama.rating}
+                review={(drama as any).review || null}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {onHold.length > 0 && (
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <span className="w-3 h-3 rounded-full bg-orange-400 mr-3"></span>
+            On Hold
+            <span className="ml-3 text-sm font-normal text-gray-400">({onHold.length})</span>
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 opacity-80">
+            {onHold.map((drama) => (
+              <FlipCard
+                key={drama.id}
+                title={drama.title}
+                subtitle={drama.year ? `(${drama.year})` : ""}
+                status="On Hold"
+                coverUrl={drama.coverUrl}
+                link={drama.link}
+                colorTheme="rose"
+                rating={drama.rating}
+                review={(drama as any).review || null}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {dropped.length > 0 && (
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <span className="w-3 h-3 rounded-full bg-rose-500 mr-3"></span>
+            Dropped
+            <span className="ml-3 text-sm font-normal text-gray-400">({dropped.length})</span>
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            {dropped.map((drama) => (
+              <FlipCard
+                key={drama.id}
+                title={drama.title}
+                subtitle={drama.year ? `(${drama.year})` : ""}
                 status={drama.status}
                 coverUrl={drama.coverUrl}
                 link={drama.link}

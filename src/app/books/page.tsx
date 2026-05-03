@@ -2,7 +2,7 @@ import { getRecentBooks } from "@/lib/goodreads";
 import { fetchDocumentRest } from "@/lib/firebase-rest";
 import { FlipCard } from "@/components/FlipCard";
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 60;
 
 export default async function BooksPage() {
   const [books, headerData] = await Promise.all([
