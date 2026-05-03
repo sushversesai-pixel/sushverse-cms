@@ -21,7 +21,7 @@ export function FoodGallery({ items }: { items: FoodItem[] }) {
         {items.map((item) => (
           <div 
             key={item.id} 
-            className="break-inside-avoid mb-6 relative group rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+            className="break-inside-avoid mb-6 relative group rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
             onClick={() => setSelectedImage(item.imageUrl)}
           >
             <div className="relative w-full overflow-hidden">
@@ -32,11 +32,14 @@ export function FoodGallery({ items }: { items: FoodItem[] }) {
                 loading="lazy"
               />
               
-              {/* Text-only Hover Overlay (No dark shade) */}
+              {/* Subtle Bottom Gradient (Lower Shade) */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+              
+              {/* Text Hover Overlay */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none">
-                <h3 className="text-white font-bold text-sm leading-tight drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{item.title}</h3>
+                <h3 className="text-white font-bold text-sm leading-tight">{item.title}</h3>
                 {item.caption && (
-                  <p className="text-white text-[10px] mt-1 line-clamp-3 italic drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">"{item.caption}"</p>
+                  <p className="text-white/90 text-[10px] mt-1 line-clamp-3 italic">"{item.caption}"</p>
                 )}
               </div>
             </div>
