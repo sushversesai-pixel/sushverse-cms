@@ -36,9 +36,9 @@ export default async function LyricsPage() {
           No lyrics have been added yet.
         </div>
       ) : (
-        <div className="columns-1 md:columns-2 gap-6 space-y-6">
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 md:gap-6">
           {lyrics.map((lyric) => (
-            <div key={lyric.id} className="break-inside-avoid">
+            <div key={lyric.id} className="break-inside-avoid mb-6">
               <LyricCard lyric={lyric} />
             </div>
           ))}

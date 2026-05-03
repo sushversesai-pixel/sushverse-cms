@@ -40,7 +40,7 @@ export function LyricCard({ lyric }: { lyric: LyricItem }) {
     <motion.div
       layout
       onClick={() => setIsExpanded(!isExpanded)}
-      className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden group"
+      className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
     >
       <motion.div layout className="flex justify-between items-start mb-4">
         <div>
