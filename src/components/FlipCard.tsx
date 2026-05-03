@@ -103,32 +103,37 @@ export function FlipCard({
             <h3 className="font-bold text-base mb-1 line-clamp-2 text-black dark:text-white">{title}</h3>
             {subtitle && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{subtitle}</p>}
             
-            {rating ? (
-              <div className="flex flex-col items-center mb-3">
-                {typeof rating === 'number' ? (
-                  <>
-                    <div className="flex items-center gap-0.5">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          size={14}
-                          className={`${
-                            star <= Math.floor(rating)
-                              ? "fill-current text-yellow-500"
-                              : star - 0.5 <= rating
-                                ? "fill-current text-yellow-500/50"
-                                : "text-gray-200 dark:text-gray-800"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mt-1">{rating}/5</span>
-                  </>
-                ) : (
-                  <span className="text-sm font-medium text-yellow-600 dark:text-yellow-500">{rating}</span>
-                )}
-              </div>
-            ) : <div className="mb-2" />}
+            {rating ? (() => {
+              const numRating = typeof rating === 'number' ? rating : parseFloat(String(rating));
+              const isNumeric = !isNaN(numRating);
+              
+              return (
+                <div className="flex flex-col items-center mb-3">
+                  {isNumeric ? (
+                    <>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            size={14}
+                            className={`${
+                              star <= Math.floor(numRating)
+                                ? "fill-current text-yellow-500"
+                                : star - 0.5 <= numRating
+                                  ? "fill-current text-yellow-500/50"
+                                  : "text-gray-200 dark:text-gray-800"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mt-1">{numRating}/5</span>
+                    </>
+                  ) : (
+                    <span className="text-sm font-medium text-yellow-600 dark:text-yellow-500">{rating}</span>
+                  )}
+                </div>
+              );
+            })() : <div className="mb-2" />}
           </div>
 
           {/* Review / Body Area */}
