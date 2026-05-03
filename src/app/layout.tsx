@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { HoneypotLogo } from "@/components/HoneypotLogo";
 import { CatLogo } from "@/components/CatLogo";
 import { fetchDocumentRest } from "@/lib/firebase-rest";
+import { StarsDecoration } from "@/components/StarsDecoration";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -30,6 +31,10 @@ export default async function RootLayout({
         <div className="fixed top-20 left-4 md:left-12 pointer-events-none z-0 opacity-10 dark:opacity-20 flex items-end">
           <HoneypotLogo className="w-24 h-24 md:w-32 md:h-32 text-gray-900 dark:text-white" />
           <CatLogo className="w-20 h-20 md:w-28 md:h-28 text-gray-900 dark:text-white -ml-6 md:-ml-8" />
+        </div>
+
+        <div className="fixed bottom-12 right-4 md:right-12 pointer-events-none z-0 opacity-10 dark:opacity-20">
+          <StarsDecoration className="text-gray-900 dark:text-white" />
         </div>
 
         <Providers>
