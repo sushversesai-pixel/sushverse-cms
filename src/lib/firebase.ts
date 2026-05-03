@@ -1,6 +1,5 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBXoFOsBr-ypWYAih1iBRzinlFwVvgl3GU",
@@ -12,9 +11,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase (Singleton pattern to prevent re-initialization in dev)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-const db = getFirestore(app);
-const auth = getAuth(app);
+const db: Firestore = getFirestore(app);
 
-export { app, db, auth };
+export { app, db };

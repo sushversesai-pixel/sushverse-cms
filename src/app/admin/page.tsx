@@ -2,16 +2,35 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { auth, db } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
+import { app, db } from "@/lib/firebase";
+import { signOut, getAuth } from "firebase/auth";
 import { collection, addDoc, doc, setDoc, getDoc, getDocs, query, orderBy, deleteDoc } from "firebase/firestore";
 import { Settings, FileText, Music, LogOut, Tv, Image as ImageIcon, Type, Trash2, Utensils } from "lucide-react";
 
 export default function AdminDashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, authError } = useAuth();
   const [activeTab, setActiveTab] = useState("settings");
 
-  const handleSignOut = () => signOut(auth);
+  const handleSignOut = () => {
+    try {
+      const auth = getAuth(app);
+      signOut(auth);
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
+  };
+
+  if (authError) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-red-600 mb-2">Authentication Error</h2>
+          <p className="text-gray-600 dark:text-gray-400">Please check your Firebase configuration.</p>
+          <p className="text-sm text-gray-500 mt-2">{authError}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !user) return <div className="p-12 text-center">Loading...</div>;
 
