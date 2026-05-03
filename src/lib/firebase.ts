@@ -3,12 +3,12 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyBXoFOsBr-ypWYAih1iBRzinlFwVvgl3GU",
+  authDomain: "portfolio-cms-6ec48.firebaseapp.com",
+  projectId: "portfolio-cms-6ec48",
+  storageBucket: "portfolio-cms-6ec48.firebasestorage.app",
+  messagingSenderId: "903523878548",
+  appId: "1:903523878548:web:a56ba94746751fc4cd5681",
 };
 
 // Initialize Firebase (Singleton pattern to prevent re-initialization in dev)
