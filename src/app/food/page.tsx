@@ -46,22 +46,22 @@ export default async function FoodPage() {
       ) : (
         <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6">
           {foodItems.map((item) => (
-            <div key={item.id} className="break-inside-avoid mb-8 group">
-              <div className="relative rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-100 dark:border-gray-800 shadow-sm transition-shadow hover:shadow-md">
+            <div key={item.id} className="break-inside-avoid mb-6 relative group rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+              <div className="relative w-full overflow-hidden">
                 <img
                   src={item.imageUrl}
                   alt={item.title}
                   className="w-full h-auto block"
                   loading="lazy"
                 />
-              </div>
-              <div className="mt-3 px-1">
-                <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100">{item.title}</h3>
-                {item.caption && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                    {item.caption}
-                  </p>
-                )}
+                
+                {/* Simple Hover Overlay */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                  <h3 className="text-white font-bold text-sm leading-tight">{item.title}</h3>
+                  {item.caption && (
+                    <p className="text-gray-300 text-xs mt-1 line-clamp-3 italic">"{item.caption}"</p>
+                  )}
+                </div>
               </div>
             </div>
           ))}

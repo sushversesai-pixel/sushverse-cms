@@ -43,19 +43,20 @@ export default async function KDramasPage() {
             Currently Watching
             <span className="ml-3 text-sm font-normal text-gray-400">({currentlyWatching.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
             {currentlyWatching.map((drama) => (
-              <FlipCard
-                key={drama.id}
-                title={drama.title}
-                subtitle={drama.year ? `(${drama.year})` : ""}
-                status="Watching"
-                coverUrl={drama.coverUrl}
-                link={drama.link}
-                colorTheme="rose"
-                rating={drama.rating}
-                review={(drama as any).review || null}
-              />
+              <div key={drama.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  title={drama.title}
+                  subtitle={drama.year ? `(${drama.year})` : ""}
+                  status="Watching"
+                  coverUrl={drama.coverUrl}
+                  link={drama.link}
+                  colorTheme="rose"
+                  rating={drama.rating}
+                  review={(drama as any).review || null}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -68,18 +69,20 @@ export default async function KDramasPage() {
             Completed
             <span className="ml-3 text-sm font-normal text-gray-400">({completed.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
             {completed.map((drama) => (
-              <FlipCard
-                key={drama.id}
-                title={drama.title}
-                subtitle={drama.year ? `(${drama.year})` : ""}
-                coverUrl={drama.coverUrl}
-                link={drama.link}
-                colorTheme="rose"
-                rating={drama.rating}
-                review={(drama as any).review || null}
-              />
+              <div key={drama.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  key={drama.id}
+                  title={drama.title}
+                  subtitle={drama.year ? `(${drama.year})` : ""}
+                  coverUrl={drama.coverUrl}
+                  link={drama.link}
+                  colorTheme="rose"
+                  rating={drama.rating}
+                  review={(drama as any).review || null}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -92,19 +95,20 @@ export default async function KDramasPage() {
             Plan to Watch
             <span className="ml-3 text-sm font-normal text-gray-400">({planToWatch.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
             {planToWatch.map((drama) => (
-              <FlipCard
-                key={drama.id}
-                title={drama.title}
-                subtitle={drama.year ? `(${drama.year})` : ""}
-                status="Plan to Watch"
-                coverUrl={drama.coverUrl}
-                link={drama.link}
-                colorTheme="rose"
-                rating={drama.rating}
-                review={(drama as any).review || null}
-              />
+              <div key={drama.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  title={drama.title}
+                  subtitle={drama.year ? `(${drama.year})` : ""}
+                  status="Plan to Watch"
+                  coverUrl={drama.coverUrl}
+                  link={drama.link}
+                  colorTheme="rose"
+                  rating={drama.rating}
+                  review={(drama as any).review || null}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -117,19 +121,20 @@ export default async function KDramasPage() {
             On Hold
             <span className="ml-3 text-sm font-normal text-gray-400">({onHold.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 opacity-80">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6 opacity-80">
             {onHold.map((drama) => (
-              <FlipCard
-                key={drama.id}
-                title={drama.title}
-                subtitle={drama.year ? `(${drama.year})` : ""}
-                status="On Hold"
-                coverUrl={drama.coverUrl}
-                link={drama.link}
-                colorTheme="rose"
-                rating={drama.rating}
-                review={(drama as any).review || null}
-              />
+              <div key={drama.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  title={drama.title}
+                  subtitle={drama.year ? `(${drama.year})` : ""}
+                  status="On Hold"
+                  coverUrl={drama.coverUrl}
+                  link={drama.link}
+                  colorTheme="rose"
+                  rating={drama.rating}
+                  review={(drama as any).review || null}
+                />
+              </div>
             ))}
           </div>
         </section>
@@ -142,19 +147,20 @@ export default async function KDramasPage() {
             Dropped
             <span className="ml-3 text-sm font-normal text-gray-400">({dropped.length})</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
             {dropped.map((drama) => (
-              <FlipCard
-                key={drama.id}
-                title={drama.title}
-                subtitle={drama.year ? `(${drama.year})` : ""}
-                status={drama.status}
-                coverUrl={drama.coverUrl}
-                link={drama.link}
-                colorTheme="rose"
-                rating={drama.rating}
-                review={(drama as any).review || null}
-              />
+              <div key={drama.id} className="break-inside-avoid mb-6">
+                <FlipCard
+                  title={drama.title}
+                  subtitle={drama.year ? `(${drama.year})` : ""}
+                  status={drama.status}
+                  coverUrl={drama.coverUrl}
+                  link={drama.link}
+                  colorTheme="rose"
+                  rating={drama.rating}
+                  review={(drama as any).review || null}
+                />
+              </div>
             ))}
           </div>
         </section>
