@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Caveat } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
@@ -8,6 +8,7 @@ import { CatLogo } from "@/components/CatLogo";
 import { fetchDocumentRest } from "@/lib/firebase-rest";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const caveat = Caveat({ subsets: ["latin"], variable: "--font-caveat" });
 
 export const metadata: Metadata = {
   title: "Sushverse - Personal CMS",
@@ -23,7 +24,7 @@ export default async function RootLayout({
   const siteName = settings?.siteName || "Sushverse";
   const navOverrides = settings?.navLinks || {};
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${caveat.variable}`}>
       <body suppressHydrationWarning className="min-h-screen bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-gray-50 transition-colors duration-300 antialiased font-sans flex flex-col relative overflow-x-hidden">
         
         {/* Floating background Logos */}

@@ -1,247 +1,405 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
+
+type AnimationStatus = "idle" | "fold1" | "fold2" | "fly" | "done";
 
 export function SuggestionBox() {
   const [suggestion, setSuggestion] = useState("");
-  const [status, setStatus] = useState<"idle" | "folding1" | "folding2" | "mailing" | "done">("idle");
-  const [isTyping, setIsTyping] = useState(false);
-  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [status, setStatus] = useState<AnimationStatus>("idle");
+  const [isWriting, setIsWriting] = useState(false);
+  const [inkSplatter, setInkSplatter] = useState<{ x: number; y: number; id: number }[]>([]);
+  const writingTimeout = useRef<NodeJS.Timeout | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const splatterIdRef = useRef(0);
 
+  // Handle typing with quill animation
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setSuggestion(e.target.value);
-    setIsTyping(true);
-    if (typingTimeout.current) clearTimeout(typingTimeout.current);
-    typingTimeout.current = setTimeout(() => setIsTyping(false), 200);
+    const newValue = e.target.value;
+    const isAddingChar = newValue.length > suggestion.length;
+    
+    setSuggestion(newValue);
+    setIsWriting(true);
+    
+    // Add ink splatter effect occasionally when typing
+    if (isAddingChar && Math.random() > 0.85) {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        splatterIdRef.current += 1;
+        setInkSplatter(prev => [...prev.slice(-5), { 
+          x: Math.random() * 80 + 10, 
+          y: Math.random() * 60 + 20, 
+          id: splatterIdRef.current 
+        }]);
+      }
+    }
+    
+    if (writingTimeout.current) clearTimeout(writingTimeout.current);
+    writingTimeout.current = setTimeout(() => setIsWriting(false), 150);
   };
+
+  // Calculate quill position based on text
+  const getQuillPosition = () => {
+    const charsPerLine = 36;
+    const lineHeight = 28;
+    const lines = suggestion.split('\n');
+    
+    let totalLines = 0;
+    for (let i = 0; i < lines.length - 1; i++) {
+      totalLines += Math.ceil((lines[i].length || 1) / charsPerLine);
+    }
+    const lastLine = lines[lines.length - 1] || "";
+    const charsOnLastLine = lastLine.length % charsPerLine;
+    totalLines += Math.floor(lastLine.length / charsPerLine);
+    
+    const x = 48 + (charsOnLastLine * 7.5);
+    const y = 24 + (totalLines * lineHeight);
+    
+    return { x: Math.min(x, 320), y: Math.min(y, 140) };
+  };
+
+  const quillPos = getQuillPosition();
+  const quillWiggle = isWriting ? (suggestion.length % 2 === 0 ? -18 : -8) : -12;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!suggestion.trim() || status !== "idle") return;
 
-    // Sequence:
-    // 1. First Fold (Vertical half)
-    setStatus("folding1");
+    // Animation sequence: fold1 -> fold2 -> fly -> done
+    setStatus("fold1");
     
-    // 2. Second Fold (Horizontal half)
     setTimeout(() => {
-      setStatus("folding2");
+      setStatus("fold2");
       
-      // 3. Mailing (Bee flight)
       setTimeout(() => {
-        setStatus("mailing");
+        setStatus("fly");
         
-        // 4. Done (Mailbox closes, trigger mail)
         setTimeout(() => {
           setStatus("done");
           
+          // Open mailto
           const subject = encodeURIComponent("Sushverse Suggestion");
           const body = encodeURIComponent(suggestion);
           window.open(`mailto:sushversesai@gmail.com?subject=${subject}&body=${body}`);
           
-          // Reset
+          // Reset after delay
           setTimeout(() => {
             setSuggestion("");
+            setInkSplatter([]);
             setStatus("idle");
-          }, 3000);
-        }, 1500); // Wait 1.5s for the bee flight animation
-      }, 600); // Wait 0.6s for fold 2
-    }, 600); // Wait 0.6s for fold 1
+          }, 2500);
+        }, 1200);
+      }, 700);
+    }, 700);
   };
 
-  const maxCharsPerLine = 38;
-  const charWidth = 8.5; 
-  
-  let totalYLines = 0;
-  const lines = suggestion.split('\n');
-  for (let i = 0; i < lines.length - 1; i++) {
-    totalYLines += Math.floor(lines[i].length / maxCharsPerLine) + 1;
-  }
-  const lastLine = lines[lines.length - 1] || "";
-  totalYLines += Math.floor(lastLine.length / maxCharsPerLine);
-  const charsOnCurrentLine = lastLine.length % maxCharsPerLine;
-  
-  const xOffset = charsOnCurrentLine * charWidth;
-  const yOffset = totalYLines * 32;
+  // Get paper transform based on status
+  const getPaperStyle = (): React.CSSProperties => {
+    const base: React.CSSProperties = {
+      transformStyle: "preserve-3d",
+      transition: "transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
+    };
 
-  const wiggle = isTyping ? (suggestion.length % 2 === 0 ? "-15deg" : "-5deg") : "-10deg";
-
-  // Calculate folding transform styles
-  const getFolderStyle = () => {
-    if (status === "folding1") {
-      return { transform: "perspective(1000px) rotateX(60deg) scaleY(0.6) translateY(20%)", transition: "transform 0.6s ease-in-out", opacity: 1 };
+    switch (status) {
+      case "fold1":
+        // First fold - fold in half horizontally (top to bottom)
+        return {
+          ...base,
+          transform: "perspective(800px) rotateX(90deg) scaleY(0.5)",
+          transformOrigin: "center bottom",
+        };
+      case "fold2":
+        // Second fold - fold in half vertically (left to right)
+        return {
+          ...base,
+          transform: "perspective(800px) rotateX(90deg) rotateY(90deg) scale(0.25)",
+          transformOrigin: "center center",
+        };
+      case "fly":
+        // Fly to the letterbox
+        return {
+          ...base,
+          transform: "perspective(800px) rotateX(90deg) rotateY(90deg) scale(0.15) translateX(400px) translateY(-100px)",
+          transition: "transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
+        };
+      case "done":
+        return {
+          ...base,
+          transform: "perspective(800px) scale(0)",
+          opacity: 0,
+          transition: "all 0.3s ease-out",
+        };
+      default:
+        return {
+          ...base,
+          transform: "perspective(800px) rotateX(0deg) scale(1)",
+        };
     }
-    if (status === "folding2" || status === "mailing") {
-      return { transform: "perspective(1000px) rotateX(60deg) rotateY(60deg) scale(0.3) translate(20%, 20%)", transition: "transform 0.6s ease-in-out", opacity: 1 };
-    }
-    if (status === "done") {
-      return { transform: "perspective(1000px) rotateX(60deg) rotateY(60deg) scale(0)", transition: "none", opacity: 0 };
-    }
-    return { transform: "perspective(1000px) rotateX(0deg) scale(1)", transition: "transform 0.6s ease-in-out", opacity: 1 };
   };
 
   return (
     <>
       <style>{`
-        @keyframes bee-flight {
-          0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-          20% { transform: translate(100px, -80px) rotate(45deg); }
-          40% { transform: translate(60px, 20px) rotate(-60deg); }   /* Loop back! */
-          60% { transform: translate(250px, -60px) rotate(20deg); }
-          80% { transform: translate(350px, 0px) rotate(45deg) scale(0.5); opacity: 1; }
-          100% { transform: translate(400px, 60px) rotate(90deg) scale(0); opacity: 0; }
+        @keyframes ink-drop {
+          0% { transform: scale(0); opacity: 0.8; }
+          50% { transform: scale(1.2); opacity: 0.5; }
+          100% { transform: scale(1); opacity: 0.3; }
         }
-        .animate-bee {
-          animation: bee-flight 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        @keyframes quill-scratch {
+          0%, 100% { transform: translate(-10px, -50px) rotate(var(--quill-angle)); }
+          25% { transform: translate(-8px, -48px) rotate(calc(var(--quill-angle) - 3deg)); }
+          75% { transform: translate(-12px, -52px) rotate(calc(var(--quill-angle) + 3deg)); }
+        }
+        .ink-splatter {
+          animation: ink-drop 0.4s ease-out forwards;
+        }
+        .quill-writing {
+          animation: quill-scratch 0.15s ease-in-out infinite;
+        }
+        .paper-texture {
+          background-image: 
+            linear-gradient(90deg, transparent 48px, rgba(180, 100, 100, 0.3) 48px, rgba(180, 100, 100, 0.3) 50px, transparent 50px),
+            linear-gradient(transparent 27px, rgba(180, 180, 200, 0.4) 27px, rgba(180, 180, 200, 0.4) 28px);
+          background-size: 100% 28px;
+        }
+        .parchment-bg {
+          background: linear-gradient(135deg, #faf6ed 0%, #f5efe0 50%, #ebe5d5 100%);
+        }
+        .dark .parchment-bg {
+          background: linear-gradient(135deg, #2a2720 0%, #252218 50%, #201d15 100%);
         }
       `}</style>
-      <div className="w-full max-w-4xl mx-auto h-80 relative flex items-center justify-between bg-white dark:bg-zinc-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
+
+      <div className="w-full max-w-4xl mx-auto relative flex items-stretch justify-between gap-8 p-8">
         
-        {/* Flight Container for Bee Animation */}
-        <div className={`w-full max-w-md relative z-30 ${status === "mailing" ? "animate-bee" : ""}`}>
-          
-          {/* Paper Folder Container */}
-          <div style={{ transformOrigin: "center", ...getFolderStyle() }}>
+        {/* Paper & Form Area */}
+        <div className="flex-1 relative">
+          <div style={getPaperStyle()}>
             <form onSubmit={handleSubmit} className="relative">
-              {/* Lined Paper */}
-              <div className="relative bg-[#fdfbf7] dark:bg-zinc-800 rounded-lg shadow-md border border-[#e5e0d8] dark:border-zinc-700 overflow-hidden">
-                <div className="absolute left-8 top-0 bottom-0 w-px bg-red-400/50 z-0"></div>
+              {/* Parchment Paper */}
+              <div className="relative parchment-bg rounded-sm shadow-lg border border-amber-200/50 dark:border-amber-900/30 overflow-hidden">
                 
+                {/* Paper edge effect */}
+                <div className="absolute inset-0 shadow-inner pointer-events-none" />
+                
+                {/* Red margin line */}
+                <div className="absolute left-12 top-0 bottom-0 w-[2px] bg-red-400/40" />
+                
+                {/* Ink splatters */}
+                {inkSplatter.map((splat) => (
+                  <div
+                    key={splat.id}
+                    className="ink-splatter absolute w-1.5 h-1.5 rounded-full bg-gray-800/40 dark:bg-gray-300/40"
+                    style={{ left: `${splat.x}%`, top: `${splat.y}%` }}
+                  />
+                ))}
+
+                {/* Textarea with lined paper effect */}
                 <textarea
+                  ref={textareaRef}
                   value={suggestion}
                   onChange={handleInput}
                   disabled={status !== "idle"}
                   placeholder="Dear Sushverse, I suggest..."
-                  className="w-full h-48 pl-12 pr-6 pt-8 pb-4 bg-transparent resize-none focus:outline-none text-gray-800 dark:text-gray-200 font-medium leading-8 relative z-10"
+                  className="w-full h-44 pl-14 pr-6 pt-6 pb-4 bg-transparent paper-texture resize-none focus:outline-none text-gray-800 dark:text-gray-200 leading-7 relative z-10 placeholder:text-gray-400/60 dark:placeholder:text-gray-500/60"
                   style={{
-                    backgroundImage: "linear-gradient(transparent, transparent 31px, #cbd5e1 31px, #cbd5e1 32px)",
-                    backgroundSize: "100% 32px",
-                    lineHeight: "32px"
+                    fontFamily: "var(--font-caveat), 'Caveat', cursive, system-ui",
+                    fontSize: "1.1rem",
+                    letterSpacing: "0.02em",
                   }}
                   required
                 />
 
-                {/* Custom SVG Quill Pen tracking the text */}
+                {/* Animated Quill Pen */}
                 <div 
-                  className={`absolute text-zinc-800 dark:text-zinc-200 z-20 drop-shadow-md pointer-events-none ${status !== 'idle' ? 'opacity-0' : 'opacity-100'}`}
+                  className={`absolute pointer-events-none z-20 transition-opacity duration-300 ${status !== "idle" ? "opacity-0" : "opacity-100"} ${isWriting ? "quill-writing" : ""}`}
                   style={{
-                    left: `calc(3rem + ${xOffset}px)`,
-                    top: `calc(2rem + ${Math.min(yOffset, 160)}px)`,
-                    transform: `translate(-10px, -58px) rotate(${wiggle})`,
-                    transition: "left 0.1s ease-out, top 0.2s ease-out, transform 0.05s linear, opacity 0.3s"
+                    left: `${quillPos.x}px`,
+                    top: `${quillPos.y}px`,
+                    transform: `translate(-10px, -50px) rotate(${quillWiggle}deg)`,
+                    transition: isWriting ? "none" : "left 0.15s ease-out, top 0.15s ease-out",
+                    ["--quill-angle" as string]: `${quillWiggle}deg`,
                   }}
                 >
-                  <CustomQuill className="w-16 h-16" />
+                  <QuillPen className="w-14 h-14 drop-shadow-md" />
                 </div>
+
+                {/* Ink well indicator when writing */}
+                {isWriting && (
+                  <div 
+                    className="absolute w-1 h-1 rounded-full bg-gray-800 dark:bg-gray-200 opacity-60"
+                    style={{
+                      left: `${quillPos.x + 2}px`,
+                      top: `${quillPos.y - 2}px`,
+                    }}
+                  />
+                )}
               </div>
 
-              <div className="mt-4 flex justify-end">
+              {/* Submit Button */}
+              <div className={`mt-4 flex justify-end transition-opacity duration-300 ${status !== "idle" ? "opacity-0" : "opacity-100"}`}>
                 <button
                   type="submit"
                   disabled={!suggestion.trim() || status !== "idle"}
-                  className={`flex items-center gap-2 px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-full hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${status !== "idle" ? "opacity-0" : "opacity-100"}`}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-amber-800 dark:bg-amber-700 text-white font-semibold rounded-full hover:bg-amber-900 dark:hover:bg-amber-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
                 >
-                  Send <Send size={16} />
+                  Send Letter <Send size={16} />
                 </button>
               </div>
             </form>
           </div>
+
+          {/* "Sending..." indicator */}
+          {status !== "idle" && status !== "done" && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-amber-800 dark:text-amber-400 font-medium animate-pulse">
+                {status === "fold1" && "Folding letter..."}
+                {status === "fold2" && "Folding again..."}
+                {status === "fly" && "Sending to mailbox..."}
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Mailbox Area */}
-        <div className="relative w-64 h-72 flex-shrink-0 z-20 flex items-end justify-center">
-          <Mailbox isDoorOpen={status === "folding1" || status === "folding2" || status === "mailing"} hasMail={status === "done"} />
+        {/* Letterbox */}
+        <div className="w-48 flex-shrink-0 flex items-end justify-center">
+          <Letterbox 
+            isOpen={status === "fold1" || status === "fold2" || status === "fly"} 
+            hasLetter={status === "done"} 
+          />
         </div>
-
       </div>
     </>
   );
 }
 
-// Custom Quill SVG perfectly mimicking the feather shape
-function CustomQuill({ className = "" }: { className?: string }) {
+// Elegant Quill Pen SVG
+function QuillPen({ className = "" }: { className?: string }) {
   return (
     <svg 
-      viewBox="0 0 100 100" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
+      viewBox="0 0 64 64" 
       className={className}
+      fill="none"
     >
-      <path d="M 15 90 C 30 70 50 30 70 10" strokeWidth="3" />
-      <path d="M 15 90 C 25 80 38 75 42 65 L 35 62 C 50 45 60 30 70 10" />
-      <path d="M 46 50 L 40 50 C 55 35 65 20 70 10" />
-      <path d="M 15 90 C 15 80 20 70 28 60 L 22 58 C 35 40 50 20 70 10" />
-      <path d="M 32 46 L 28 42 C 45 25 60 15 70 10" />
-      <path d="M 28 72 L 34 68" strokeWidth="1" />
-      <path d="M 38 56 L 46 52" strokeWidth="1" />
-      <path d="M 48 40 L 56 36" strokeWidth="1" />
-      <path d="M 34 60 L 26 58" strokeWidth="1" />
-      <path d="M 45 44 L 38 40" strokeWidth="1" />
+      {/* Feather body */}
+      <path 
+        d="M 12 58 Q 20 45 28 30 Q 36 18 52 6" 
+        stroke="#4a3728" 
+        strokeWidth="1.5" 
+        fill="none"
+      />
+      {/* Feather vanes - left side */}
+      <path 
+        d="M 52 6 Q 40 12 32 22 Q 26 30 22 42 Q 20 38 24 28 Q 28 18 40 10 Q 46 6 52 6" 
+        fill="#f5f0e8"
+        stroke="#4a3728"
+        strokeWidth="0.5"
+      />
+      {/* Feather vanes - right side */}
+      <path 
+        d="M 52 6 Q 48 14 42 24 Q 36 34 30 42 Q 32 36 38 26 Q 44 16 52 6" 
+        fill="#e8e0d0"
+        stroke="#4a3728"
+        strokeWidth="0.5"
+      />
+      {/* Quill tip/nib */}
+      <path 
+        d="M 12 58 L 14 52 L 18 54 Z" 
+        fill="#4a3728"
+      />
+      {/* Ink at tip */}
+      <circle cx="12" cy="58" r="1.5" fill="#1a1a1a" />
+      {/* Feather texture lines */}
+      <path d="M 46 10 Q 38 20 32 32" stroke="#c9b89c" strokeWidth="0.5" fill="none" />
+      <path d="M 42 16 Q 36 24 30 36" stroke="#c9b89c" strokeWidth="0.5" fill="none" />
+      <path d="M 38 22 Q 32 30 26 42" stroke="#c9b89c" strokeWidth="0.5" fill="none" />
     </svg>
   );
 }
 
-// Mailbox SVG neatly drawn mathematically (No Bird, No Heart, Standard Flag)
-function Mailbox({ isDoorOpen, hasMail }: { isDoorOpen: boolean, hasMail: boolean }) {
+// Classic Letterbox
+function Letterbox({ isOpen, hasLetter }: { isOpen: boolean; hasLetter: boolean }) {
   return (
-    <div className="relative w-full h-full text-gray-800 dark:text-gray-200">
-      
-      {/* Base & Post Background SVG */}
-      <svg viewBox="0 0 200 300" className="w-full h-full absolute top-0 left-0" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        
-        {/* Neat Grass Base */}
-        <path d="M 40 280 Q 55 240 60 280 Q 75 230 80 280 Q 95 220 100 280 Q 105 220 120 280 Q 125 230 140 280 Q 145 240 160 280" />
-        <line x1="30" y1="280" x2="170" y2="280" strokeWidth="4" />
-        <path d="M 35 285 Q 100 290 165 285" strokeDasharray="2 4" strokeWidth="2" />
-
+    <div className="relative w-full h-64">
+      <svg viewBox="0 0 120 200" className="w-full h-full" fill="none">
         {/* Post */}
-        <rect x="85" y="140" width="30" height="140" fill="currentColor" fillOpacity="0.05" />
-        <path d="M 85 140 v 140" />
-        <path d="M 115 140 v 140" />
+        <rect 
+          x="50" y="100" width="20" height="95" 
+          fill="#8B4513" 
+          stroke="#5D3A1A" 
+          strokeWidth="2"
+        />
         
-        {/* Standard Mail Flag */}
+        {/* Post grain lines */}
+        <line x1="55" y1="105" x2="55" y2="190" stroke="#5D3A1A" strokeWidth="0.5" opacity="0.5" />
+        <line x1="65" y1="105" x2="65" y2="190" stroke="#5D3A1A" strokeWidth="0.5" opacity="0.5" />
+        
+        {/* Grass */}
+        <path 
+          d="M 20 195 Q 30 180 35 195 Q 45 175 50 195 Q 60 170 70 195 Q 80 175 85 195 Q 95 180 100 195" 
+          stroke="#4a7c59" 
+          strokeWidth="2" 
+          fill="none"
+        />
+        <line x1="15" y1="195" x2="105" y2="195" stroke="#3d6b4a" strokeWidth="3" />
+        
+        {/* Mailbox body */}
+        <path 
+          d="M 20 100 L 20 60 Q 20 30 60 30 Q 100 30 100 60 L 100 100 Z" 
+          fill="#2563eb" 
+          stroke="#1e40af" 
+          strokeWidth="2"
+        />
+        
+        {/* Mailbox front panel */}
+        <rect x="30" y="70" width="60" height="25" fill="#1e40af" rx="2" />
+        
+        {/* Letter slot */}
+        <rect x="35" y="78" width="50" height="8" fill="#0f172a" rx="1" />
+        
+        {/* Decorative elements */}
+        <circle cx="60" cy="55" r="8" fill="#1e40af" stroke="#1e3a8a" strokeWidth="1" />
+        <text x="60" y="59" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">S</text>
+        
+        {/* Flag */}
         <g 
-          className="transition-transform duration-500 ease-in-out origin-[130px_100px]"
-          style={{ transform: hasMail ? 'rotate(0deg)' : 'rotate(90deg)' }}
+          className="transition-transform duration-500 origin-[105px_70px]"
+          style={{ transform: hasLetter ? "rotate(0deg)" : "rotate(-90deg)" }}
         >
-          <line x1="130" y1="100" x2="130" y2="40" strokeWidth="4" />
-          <circle cx="130" cy="100" r="3" fill="currentColor" />
-          <rect x="130" y="40" width="30" height="20" fill={hasMail ? "#ef4444" : "currentColor"} fillOpacity={hasMail ? 1 : 0.1} stroke={hasMail ? "#ef4444" : "currentColor"} className="transition-colors duration-500" />
+          <rect x="100" y="50" width="4" height="30" fill="#8B4513" />
+          <rect 
+            x="104" y="50" width="14" height="12" 
+            fill={hasLetter ? "#ef4444" : "#9ca3af"}
+            className="transition-colors duration-500"
+          />
         </g>
-
-        {/* Inside Cavity Background */}
-        <path d="M 40 140 L 160 140 L 160 80 A 30 30 0 0 0 130 50 L 70 50 A 30 30 0 0 0 40 80 Z" fill="currentColor" fillOpacity="0.08" />
       </svg>
 
-      {/* 3D Animated Door overlaying the hole perfectly */}
+      {/* Animated door/flap */}
       <div 
-        className="absolute border-[3px] border-gray-800 dark:border-gray-200 bg-white dark:bg-zinc-800 transition-all duration-700 ease-in-out"
+        className="absolute bg-blue-600 border-2 border-blue-800 rounded-t-full transition-transform duration-500"
         style={{
-          left: '20%',
-          top: '16.66%',
-          width: '30%',
-          height: '30%',
-          borderTopLeftRadius: '30px',
-          borderTopRightRadius: '30px',
-          transformOrigin: 'bottom',
-          transform: isDoorOpen ? 'rotateX(110deg)' : 'rotateX(0deg)',
-          transformStyle: 'preserve-3d',
-          zIndex: 40
+          left: "16.5%",
+          top: "15%",
+          width: "67%",
+          height: "35%",
+          transformOrigin: "bottom center",
+          transform: isOpen ? "perspective(200px) rotateX(-120deg)" : "perspective(200px) rotateX(0deg)",
         }}
       >
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3 h-5 border-[3px] border-gray-800 dark:border-gray-200 rounded-sm"></div>
+        {/* Door handle */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-4 h-2 bg-blue-800 rounded-sm" />
       </div>
-      
-      {/* Front Outline to hide seams */}
-      <svg viewBox="0 0 200 300" className="w-full h-full absolute top-0 left-0 pointer-events-none z-50" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M 40 140 L 100 140 L 100 80 A 30 30 0 0 0 40 80 Z" />
-        <path d="M 70 50 L 130 50 A 30 30 0 0 1 160 80 L 160 140" />
-      </svg>
 
+      {/* Success message */}
+      {hasLetter && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+          <span className="text-sm font-medium text-green-600 dark:text-green-400 animate-pulse">
+            Letter received!
+          </span>
+        </div>
+      )}
     </div>
   );
 }
