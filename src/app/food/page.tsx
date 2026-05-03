@@ -40,27 +40,34 @@ export default async function FoodPage() {
       </header>
 
       {foodItems.length === 0 ? (
-        <div className="py-20 text-center text-gray-500">
+        <div className="py-20 text-center text-gray-500 bg-gray-50 dark:bg-zinc-900/50 rounded-3xl border border-gray-100 dark:border-gray-800">
           No food images have been added to the gallery yet.
         </div>
       ) : (
-        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6">
           {foodItems.map((item) => (
-            <div key={item.id} className="break-inside-avoid relative group rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all">
+            <div key={item.id} className="break-inside-avoid mb-6 relative group rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
               <div className="relative w-full overflow-hidden">
                 <img
                   src={item.imageUrl}
                   alt={item.title}
-                  className="w-full h-auto block transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-auto block transition-transform duration-1000 ease-out group-hover:scale-110"
                   loading="lazy"
                 />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <h3 className="text-white font-bold text-sm tracking-wide drop-shadow-md">{item.title}</h3>
-                {item.caption && (
-                  <p className="text-gray-200 text-xs mt-1 line-clamp-3 drop-shadow-md italic">"{item.caption}"</p>
-                )}
+                
+                {/* Modern Pinterest-style Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl">
+                    <h3 className="text-white font-bold text-base tracking-wide">{item.title}</h3>
+                    {item.caption && (
+                      <p className="text-white/80 text-xs mt-1.5 line-clamp-4 italic leading-relaxed">
+                        {item.caption}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
