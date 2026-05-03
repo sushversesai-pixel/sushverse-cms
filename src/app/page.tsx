@@ -6,7 +6,7 @@ import Image from "next/image";
 import { getRecentMovies } from "@/lib/letterboxd";
 import { getRecentDramas } from "@/lib/mydramalist";
 import { getRecentBooks } from "@/lib/goodreads";
-import { SuggestionBox } from "@/components/SuggestionBox";
+
 
 export const revalidate = 3600;
 
@@ -128,10 +128,6 @@ export default async function Home() {
 
       </section>
 
-      {/* Suggestion Box */}
-      <section className="w-full mt-12 mb-12">
-        <SuggestionBox />
-      </section>
     </div>
   );
 }
