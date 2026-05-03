@@ -14,12 +14,22 @@ export interface BookItem {
   review: string;
   coverUrl: string | null;
   link: string;
+  status: "Read" | "Currently Reading" | "Want to Read";
 }
 
-export async function getRecentBooks(userId: string = "134004880-sai"): Promise<BookItem[]> {
+export async function getRecentBooks(userId: string = "134004880-sai", shelf: string = "read"): Promise<BookItem[]> {
   try {
-    // Goodreads RSS for the "read" shelf. We request up to 100 books (the typical maximum for RSS feeds).
-    const feed = await parser.parseURL(`https://www.goodreads.com/review/list_rss/${userId}?shelf=read&per_page=100`);
+    // Map Goodreads shelf names to display status
+    const statusMap: Record<string, BookItem["status"]> = {
+      "read": "Read",
+      "currently-reading": "Currently Reading",
+      "to-read": "Want to Read"
+    };
+    
+    const displayStatus = statusMap[shelf] || "Read";
+
+    // Goodreads RSS for the specified shelf.
+    const feed = await parser.parseURL(`https://www.goodreads.com/review/list_rss/${userId}?shelf=${shelf}&per_page=100`);
     
     return feed.items.map((rawItem) => {
       const item = rawItem as any;
@@ -42,14 +52,16 @@ export async function getRecentBooks(userId: string = "134004880-sai"): Promise<
         id: item.guid || item.link || Math.random().toString(),
         title: item.title || "Unknown Book",
         author: item.author_name || "",
-        rating: item.user_rating ? parseInt(item.user_rating) : 0,
+        rating: item.user_rating ? parseFloat(item.user_rating) : 0,
         review: cleanReview,
         link: item.link || "",
         coverUrl,
+        status: displayStatus,
       };
     });
   } catch (error) {
-    console.warn("Notice: Could not fetch Goodreads RSS data. Returning empty list.");
+    console.warn(`Notice: Could not fetch Goodreads RSS data for shelf: ${shelf}.`);
     return [];
   }
 }
+
