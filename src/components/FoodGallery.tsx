@@ -21,7 +21,7 @@ export function FoodGallery({ items }: { items: FoodItem[] }) {
         {items.map((item) => (
           <div 
             key={item.id} 
-            className="break-inside-avoid mb-6 relative group rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all cursor-pointer"
+            className="break-inside-avoid mb-6 relative group rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 cursor-pointer"
             onClick={() => setSelectedImage(item.imageUrl)}
           >
             <div className="relative w-full overflow-hidden">
