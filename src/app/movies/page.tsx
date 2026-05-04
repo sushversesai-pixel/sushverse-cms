@@ -1,6 +1,4 @@
-import { getRecentMovies } from "@/lib/letterboxd";
-import { fetchDocumentRest } from "@/lib/firebase-rest";
-import { FlipCard } from "@/components/FlipCard";
+import { MovieGallery } from "@/components/MovieGallery";
 
 export const revalidate = 60;
 
@@ -27,23 +25,7 @@ export default async function MoviesPage() {
           <p>No recent movies found or failed to load.</p>
         </div>
       ) : (
-        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4 md:gap-6">
-          {movies.map((movie) => (
-            <div key={movie.id} className="break-inside-avoid mb-6">
-              <FlipCard
-                title={movie.title}
-                subtitle={movie.year ? `(${movie.year})` : ""}
-                coverUrl={movie.posterUrl}
-                rating={movie.rating}
-                review={movie.review}
-                link={movie.link}
-                date={movie.watchedDate}
-                emptyMessage="Watched it and that's all, not a review."
-                colorTheme="blue"
-              />
-            </div>
-          ))}
-        </div>
+        <MovieGallery movies={movies as any} />
       )}
     </div>
   );
